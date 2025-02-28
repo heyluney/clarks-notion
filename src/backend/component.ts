@@ -10,7 +10,7 @@ const enum ComponentType {
 
 // Universal data and behaviors for each instance of Component.
 class Component {
-    // Each Component instance has a unique id, which will be a number used to uniquely identify the component.
+    // Each Component instance has a unique id.
     private static counter: number = 0;
     public readonly id: number;
 
@@ -25,6 +25,14 @@ class Component {
       this.id = ++Component.counter;
       this.parent_id = parent_id;
       this.component_type = component_type;
+    }
+
+    addChild(child_id: number) : void {
+      this.children.push(child_id);
+    }
+
+    getChildren() : number[] {
+      return this.children;
     }
   }
 
@@ -55,4 +63,4 @@ class PageComponent extends Component {
   }
 }
 
-export { Component, AppComponent, PageComponent };
+export { Component, ComponentType, AppComponent, PageComponent };
