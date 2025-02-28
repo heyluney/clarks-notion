@@ -1,13 +1,9 @@
 // import {  useState } from 'react'
 import './App.css'
 
-// 
-
 // different component types will have different interfaces
 
 // number: ComponentType
-
-// maybe I create 
 
 // interface Component {
 //   id: number;
@@ -18,6 +14,13 @@ import './App.css'
 // interface PageContextProps {
 //   components: 
 // }
+
+// I create a separate class that 
+
+
+
+
+// Pagecomponent inherits from Component
 
 function App() {
   return (

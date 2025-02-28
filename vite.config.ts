@@ -7,6 +7,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: "/clarks-notion",
   test: {
+    environment: 'jsdom',
     coverage: {
       provider: 'v8'
     }
