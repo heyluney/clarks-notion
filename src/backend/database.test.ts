@@ -17,6 +17,12 @@ describe('Database', () => {
         database.reset();
     })
 
+    test('database uses singleton pattern', () => {
+        let database2 = Database.getInstance();
+
+        expect(database).toMatchObject(database2);
+    })
+
     test('component can be added to database', () => {
         database.addComponent(page);
         const expectedDatabase = {
@@ -34,6 +40,7 @@ describe('Database', () => {
 
     test('if a component exists in the database, it can be retrieved', () => {
         database.addComponent(emoji);
+
         const expectedComponent = {
             id: emoji.id,
             parent_id: page.id,
@@ -61,6 +68,7 @@ describe('Database', () => {
 
         expect(database.numberOfComponents()).toBe(2);
 
+        // since emoji is a child of page, it should be deleted as well
         database.deleteComponent(page.id);
 
         expect(database.numberOfComponents()).toBe(0);

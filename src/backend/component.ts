@@ -1,4 +1,4 @@
-
+// ComponentType is an enum for documentation/readability and code completion.
 const enum ComponentType {
   App = 0,
   Page = 1,
@@ -7,6 +7,7 @@ const enum ComponentType {
   Tasklist = 4,
   Journal = 5
 }
+
 
 // Universal data and behaviors for each instance of Component.
 class Component {
@@ -27,9 +28,12 @@ class Component {
       this.component_type = component_type;
     }
 
-    addChild(child_id: number) : void {
-      this.children.push(child_id);
+    // Adds child id to parent id's children array at specified index. If no index is specified, adds the child id to the end of the array.
+    addChild(child_id: number, idx: number = this.children.length) : void {
+      this.children.toSpliced(idx, 0, child_id);
     }
+
+    // removeChild()
 
     getChildren() : number[] {
       return this.children;

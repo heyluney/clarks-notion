@@ -4,12 +4,11 @@ type DataShape = {
     [key: number]: Component;
 }
 
+// I think component should be an abstract class
 class Database {
     private static instance: Database;
 
-    private database: DataShape;
-
-    private constructor() {
+    private constructor(private database: DataShape = {}) {
         this.database = {};
     }
 
