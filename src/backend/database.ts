@@ -4,20 +4,26 @@ type DataShape = {
     [key: number]: Component;
 }
 
-// I think component should be an abstract class
+// class Database where I am able to explicitly set the database myself
 class Database {
     private static instance: Database;
 
-    private constructor(private database: DataShape = {}) {
-        this.database = {};
+    private constructor(private database: DataShape) {
+        this.database = database;
     }
 
     // Singleton pattern.
-    public static getInstance(): Database {
+    public static getOrCreateInstance(database: DataShape = {}): Database {
         if (!Database.instance) {
-            Database.instance = new Database();
+            Database.instance = new Database(database);
         }
         return Database.instance;
+    }
+
+    // I feel like this shouldn't be a public method
+    // restart database method that 
+    reset(): void {
+        this.database = {};
     }
 
     numberOfComponents() : number {
@@ -28,16 +34,28 @@ class Database {
         this.database[component.id] = component;
     }
 
-    reset(): void {
-        this.database = {};
-    }
-
     getDatabase() : DataShape {
         return this.database;
     }
 
     getComponent(id: number): Component | undefined {
         return this.database[id];
+    }
+
+    duplicateComponent(id: number, duplicated_parent_id: number) : number {
+        // create a new component
+        const currentComponent = this.getComponent(id);
+        if (currentComponent === undefined) return -1;
+
+        const duplicatedComponent : Component = new Component(duplicated_parent_id, currentComponent.component_type);
+        for (let child of currentComponent.children) {
+            const duplicated_child_id = 
+                this.duplicateComponent(child, duplicatedComponent.id);
+            if (duplicated_child_id !== -1)
+                duplicatedComponent.children.push(duplicated_child_id);
+        }
+
+        return duplicatedComponent.id;
     }
 
     deleteComponent(id: number): void {

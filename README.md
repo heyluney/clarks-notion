@@ -1,3 +1,7 @@
+# This projects style guidelines
+
+When using a string literal, use double quotes `"` rather than single quotes. This obviates the need for escaping the apostrophe, giving a uniform method for representing strings.
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

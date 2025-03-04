@@ -1,75 +1,68 @@
-import { describe, beforeEach, test, expect } from 'vitest'
+import { describe, test, expect } from 'vitest'
 
 import Database from './database';
-import { Component, ComponentType } from './component';
+import { PageComponent, EmojiComponent, Component,  ComponentType } from './component';
 
-describe('Database', () => {
-    let database: Database;
+const databaseTest = test.extend<{
+    database: Database, 
+}>({
+    database: async({ }, use) => {
+        const database: Database = Database.getOrCreateInstance();
 
-    // Create several test components.
-    const page = new Component(/*parent_id=*/0, ComponentType.Page);
-    const emoji = new Component(/*parent_id=*/page.id, ComponentType.Emoji);
-    page.addChild(emoji.id);
+        const page  = new Component(1, -1, [2], ComponentType.Page);
+        const emoji = new Component(2, page.id, [],  ComponentType.Emoji);
 
-    // Empty database before each test.
-    beforeEach(() => {
-        database = Database.getInstance();
-        database.reset();
-    })
-
-    test('database uses singleton pattern', () => {
-        let database2 = Database.getInstance();
-
-        expect(database).toMatchObject(database2);
-    })
-
-    test('component can be added to database', () => {
         database.addComponent(page);
-        const expectedDatabase = {
-            [page.id]: {
-                id: page.id,
-                parent_id: 0,
-                children: [emoji.id],
-                component_type: ComponentType.Page
-            }
-        }
-
-        expect(database.numberOfComponents()).toBe(1);
-        expect(database.getDatabase()).toMatchObject(expectedDatabase);
-    })
-
-    test('if a component exists in the database, it can be retrieved', () => {
         database.addComponent(emoji);
 
+        await use(database);
+        database.reset();
+    },
+})
+
+
+describe('Database', () => {
+    databaseTest('database uses singleton pattern', ({ database }) => {
+        const secondDatabase = Database.getOrCreateInstance();
+        expect(database).toMatchObject(secondDatabase);
+    })
+
+    databaseTest('if a component does not exist in database, we return undefined', ({
+    database}) => {
+        expect(database.getComponent(3)).toBe(undefined);
+    })
+
+    databaseTest('if a component exists in the database, it can be retrieved', ({ database }) => {
         const expectedComponent = {
-            id: emoji.id,
-            parent_id: page.id,
+            id: 2,
+            parent_id: 1,
             children: [],
             component_type: ComponentType.Emoji
         }
 
-        expect(database.getComponent(emoji.id)).toMatchObject(expectedComponent);
+        expect(database.getComponent(2)).toMatchObject(expectedComponent);
     })
 
-    test("a component can be deleted", () => {
-        database.addComponent(page);
-        database.addComponent(emoji);
-        
+    databaseTest('component can be added to database', ({ database }) => {
+        const component = new Component(3, -1, [], ComponentType.Journal);
+        database.addComponent(component);
+     
+        expect(database.numberOfComponents()).toBe(3);
+    })
+
+    databaseTest("a component can be deleted", ({ database }) => {
         expect(database.numberOfComponents()).toBe(2);
 
-        database.deleteComponent(emoji.id);
+        database.deleteComponent(2);
 
         expect(database.numberOfComponents()).toBe(1);
     })
 
-    test("if a component's parent is deleted, it will be deleted as well", () => {
-        database.addComponent(page);
-        database.addComponent(emoji);
-
+    databaseTest("if a component's parent is deleted, it will be deleted as well", ({ database }) => {
         expect(database.numberOfComponents()).toBe(2);
 
-        // since emoji is a child of page, it should be deleted as well
-        database.deleteComponent(page.id);
+        // Emoji component is a child of page component, so should also be deleted.
+        database.deleteComponent(1);
 
         expect(database.numberOfComponents()).toBe(0);
     })
