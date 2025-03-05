@@ -1,7 +1,9 @@
 import { describe, test, expect } from 'vitest'
 
 import Database from './database';
-import { PageComponent, EmojiComponent, Component,  ComponentType } from './component';
+import ComponentType from '../../types/component_type';
+
+import { TestComponent } from '../components/component';
 
 const databaseTest = test.extend<{
     database: Database, 
@@ -9,8 +11,15 @@ const databaseTest = test.extend<{
     database: async({ }, use) => {
         const database: Database = Database.getOrCreateInstance();
 
-        const page  = new Component(1, -1, [2], ComponentType.Page);
-        const emoji = new Component(2, page.id, [],  ComponentType.Emoji);
+        const page  = new TestComponent(
+            /*parent_id=*/0, 
+            ComponentType.Page, 
+            /*id=*/1);
+        const emoji = new TestComponent(
+            /*parent_id=*/page.id, 
+            ComponentType.Emoji, 
+            /*id=*/2);
+        page.addChild(emoji.id);
 
         database.addComponent(page);
         database.addComponent(emoji);
@@ -44,7 +53,7 @@ describe('Database', () => {
     })
 
     databaseTest('component can be added to database', ({ database }) => {
-        const component = new Component(3, -1, [], ComponentType.Journal);
+        const component = new TestComponent(0, ComponentType.Journal);
         database.addComponent(component);
      
         expect(database.numberOfComponents()).toBe(3);

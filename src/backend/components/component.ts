@@ -1,11 +1,4 @@
-enum ComponentType {
-  App = 0,
-  Page = 1,
-  Comment = 2,
-  Emoji = 3,
-  Tasklist = 4,
-  Journal = 5
-}
+import ComponentType from "../../types/component_type";
 
 // Universal data and behaviors for each instance of Component.
 class Component {
@@ -41,46 +34,15 @@ class Component {
 }
 
 
-class AppComponent extends Component {
+class TestComponent extends Component {
   constructor(
-    public parent_id : number,
-    public title : string = "Default app",
-    ) 
-  {
-    super(parent_id, ComponentType.App);
-    this.title = title;
-  }
-}
-
-class TestAppComponent extends Component {
-  constructor(
-    public parent_id : number,
-    public id : number,
-    public title : string= "Default app"
+      public parent_id: number,
+      public component_type: ComponentType = ComponentType.App,
+      public id: number = 0,
+      public children: number[] = []
   ) {
-    super(parent_id, ComponentType.App, id);
-    this.title = title;
+      super(parent_id, component_type, id, children);
   }
 }
 
-class PageComponent extends Component {
-  constructor(
-    public parent_id : number, 
-    public title : string = "Default page"
-  ) {
-    super(parent_id, ComponentType.Page);
-    this.title = title;
-  }
-}
-
-class EmojiComponent extends Component {
-  constructor(
-    public parent_id: number,
-    public title : string = "Default emoji"
-  ) {
-    super(parent_id, ComponentType.Emoji);
-    this.title = title;
-  }
-}
-
-export { Component, ComponentType, AppComponent, PageComponent, EmojiComponent };
+export { Component, ComponentType, TestComponent };

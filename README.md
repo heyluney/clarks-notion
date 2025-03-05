@@ -1,5 +1,7 @@
 # This projects style guidelines
 
+To reformat: Option + Shift + F 
+
 When using a string literal, use double quotes `"` rather than single quotes. This obviates the need for escaping the apostrophe, giving a uniform method for representing strings.
 
 # React + TypeScript + Vite

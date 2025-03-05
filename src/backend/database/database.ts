@@ -1,14 +1,13 @@
-import { Component } from './component';
+import { Component } from '../components/component';
 
 type DataShape = {
     [key: number]: Component;
 }
 
-// class Database where I am able to explicitly set the database myself
 class Database {
-    private static instance: Database;
+    protected static instance: Database;
 
-    private constructor(private database: DataShape) {
+    protected constructor(protected database: DataShape) {
         this.database = database;
     }
 
@@ -18,12 +17,6 @@ class Database {
             Database.instance = new Database(database);
         }
         return Database.instance;
-    }
-
-    // I feel like this shouldn't be a public method
-    // restart database method that 
-    reset(): void {
-        this.database = {};
     }
 
     numberOfComponents() : number {
