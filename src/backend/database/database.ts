@@ -1,54 +1,40 @@
-import { Component } from '../components/component';
-
-type DataShape = {
-    [key: number]: Component;
-}
+import Component from '../components/component';
+import DatabaseType from '../../types/database_type';
 
 class Database {
-    protected static instance: Database;
+    constructor(protected database: DatabaseType = {}) {}
 
-    protected constructor(protected database: DataShape) {
-        this.database = database;
-    }
-
-    // Singleton pattern.
-    public static getOrCreateInstance(database: DataShape = {}): Database {
-        if (!Database.instance) {
-            Database.instance = new Database(database);
-        }
-        return Database.instance;
-    }
-
-    numberOfComponents() : number {
-        return Object.keys(this.database).length;
-    }
-
-    addComponent(component: Component): undefined {
-        this.database[component.id] = component;
-    }
-
-    getDatabase() : DataShape {
+    getDatabase() : DatabaseType {
         return this.database;
     }
 
-    getComponent(id: number): Component | undefined {
+    addComponent(component: Component): void {
+        this.database[component.id] = component;
+    }
+
+    getComponent(id: number): Component {
+        if (this.database[id] === undefined) throw Error('not possible')
         return this.database[id];
     }
 
-    duplicateComponent(id: number, duplicated_parent_id: number) : number {
-        // create a new component
+    duplicateComponent(id: number, duplicated_parent_id: number) : Component[] {
         const currentComponent = this.getComponent(id);
-        if (currentComponent === undefined) return -1;
+        if (currentComponent === undefined) return [];
 
-        const duplicatedComponent : Component = new Component(duplicated_parent_id, currentComponent.component_type);
+        const duplicatedComponent : Component =
+            new Component(duplicated_parent_id, currentComponent.component_type);
+        const duplicates : Component[] = [];
+
         for (let child of currentComponent.children) {
-            const duplicated_child_id = 
-                this.duplicateComponent(child, duplicatedComponent.id);
-            if (duplicated_child_id !== -1)
-                duplicatedComponent.children.push(duplicated_child_id);
+            const duplicatedDescendants = this.duplicateComponent(child, duplicatedComponent.id);
+            for (let duplicatedChild of duplicatedDescendants) {
+                duplicates.push(duplicatedChild);
+                duplicatedComponent.children.push(duplicatedChild.id);
+            }
         }
+        duplicates.push(duplicatedComponent);
 
-        return duplicatedComponent.id;
+        return duplicates.sort((a,b) => a.id - b.id);
     }
 
     deleteComponent(id: number): void {

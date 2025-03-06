@@ -1,10 +1,10 @@
 enum ComponentType {
-    App = 0,
-    Page = 1,
-    Comment = 2,
-    Emoji = 3,
-    Tasklist = 4,
-    Journal = 5
+    App = "App",
+    Page = "Page",
+    Comment = "Comment",
+    Emoji = "Emoji",
+    Tasklist = "Tasklist",
+    Journal = "Journal"
 }
 
 export default ComponentType;

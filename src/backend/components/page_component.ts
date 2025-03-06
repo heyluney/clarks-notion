@@ -1,6 +1,6 @@
-import { Component, ComponentType } from './component';
+import Component from './component';
+import ComponentType from '../../types/component_type';
 
-// 
 class PageComponent extends Component {
   constructor(
     public parent_id : number, 

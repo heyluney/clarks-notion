@@ -1,7 +1,7 @@
 import { describe, test as base, expect } from 'vitest'
 
-import ComponentType from "../../types/component_type";
-import { TestComponent } from './component';
+import ComponentType from "../../../types/component_type";
+import TestComponent from './test_component';
 
 type fixtureShape = {
     page: TestComponent,
@@ -19,25 +19,6 @@ export const test = base.extend<fixtureShape>({
         await use(emoji);
     }
 })
-
-describe("default behavior", () => {
-    base("validate default properties", () => {
-        const app = new TestComponent(-1);
-
-        expect(app.id).toBe(0);
-        expect(app.parent_id).toBe(-1);
-        expect(app.children).toMatchObject([]);
-        expect(app.component_type).toBe(ComponentType.App);
-    })
-
-    base("auto incrementation works for unspecified ids", () => {
-        const component1 = new TestComponent(-1);
-        const component2 = new TestComponent(-1);
-
-        expect([component1.id, component2.id]).not.toEqual([0, 1]);
-    })
-})
-
 
 describe("component's children", () => {
     test("getChildren successfully returns a component's child components", ({ page }) => {

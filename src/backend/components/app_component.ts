@@ -1,6 +1,5 @@
 import ComponentType from '../../types/component_type';
-
-import { Component } from './component';
+import Component from './component';
 
 class AppComponent extends Component {
   constructor(

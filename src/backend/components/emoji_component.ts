@@ -1,4 +1,5 @@
-import { Component, ComponentType } from './component';
+import Component from './component';
+import ComponentType from '../../types/component_type';
 
 class EmojiComponent extends Component {
     constructor(

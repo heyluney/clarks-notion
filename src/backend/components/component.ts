@@ -34,15 +34,6 @@ class Component {
 }
 
 
-class TestComponent extends Component {
-  constructor(
-      public parent_id: number,
-      public component_type: ComponentType = ComponentType.App,
-      public id: number = 0,
-      public children: number[] = []
-  ) {
-      super(parent_id, component_type, id, children);
-  }
-}
 
-export { Component, ComponentType, TestComponent };
+
+export default Component;
