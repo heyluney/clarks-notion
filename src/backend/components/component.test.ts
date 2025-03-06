@@ -1,21 +1,21 @@
 import { describe, test as base, expect } from 'vitest'
 
 import ComponentType from "../../../types/component_type";
-import TestComponent from './test_component';
+import Component from '../component';
 
 type fixtureShape = {
-    page: TestComponent,
-    emoji: TestComponent
+    page: Component,
+    emoji: Component
 }
 
 export const test = base.extend<fixtureShape>({
     page: async ({ }, use) => {
-        const page = new TestComponent(0, ComponentType.Page, 1, [2]);
+        const page = new Component(0, ComponentType.Page, 1, [2]);
         await use(page);
     },
     // Emoji component is a child of page component
     emoji: async ({ }, use) => {
-        const emoji = new TestComponent(1, ComponentType.Emoji, 2, []);
+        const emoji = new Component(1, ComponentType.Emoji, 2, []);
         await use(emoji);
     }
 })

@@ -1,18 +1,15 @@
 import ComponentType from "../../types/component_type";
 
-// Universal data and behaviors for each instance of Component.
-class Component {
-    // Each Component instance has a unique id.
-    private static counter : number = 0;
+import IdGenerator from "../database/id_generator";
 
+class Component<Type extends ComponentType> {
     constructor(
-      public parent_id : number,
-      public component_type : ComponentType,
-      public readonly id: number = Component.counter++,
+      public parent_id : number = -1,
+      public component_type : Type,
+      public readonly id: number = IdGenerator.getNewId(),
       public children : number[] = [],
     ) {}
 
-    // Getters
     getChildren() : number[] {
       return this.children;
     }
