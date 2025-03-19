@@ -1,4 +1,4 @@
-enum ComponentType {
+export enum ComponentEnum {
     App = "App",
     Page = "Page",
     Comment = "Comment",
@@ -7,4 +7,9 @@ enum ComponentType {
     Journal = "Journal"
 }
 
-export default ComponentType;
+export type ComponentType = {
+    id: number;
+    component_type: ComponentEnum;
+    parent_id: number;
+    children: number[];
+}

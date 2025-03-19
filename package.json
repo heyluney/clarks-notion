@@ -2,6 +2,7 @@
   "name": "clarks-notion",
   "private": true,
   "version": "0.0.0",
+  "typeComment": "if type:module is omitted, JS files are understood to be commonJS",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,6 +10,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "test": "vitest",
+    "mtest": "vitest run",
     "coverage": "vitest run --coverage",
     "lint": "eslint .",
     "preview": "vite preview"

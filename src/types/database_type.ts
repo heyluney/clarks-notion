@@ -1,7 +1,5 @@
-import { Component } from "../backend/components/component";
+import { ComponentType } from "./component_type";
 
-type DatabaseType = {
-    [key: number]: Component;
+export type DatabaseType = {
+    [key: number]: ComponentType;
 }
-
-export default DatabaseType;
