@@ -1,15 +1,80 @@
-import { ComponentType } from '../../types/component_type';
-import { DatabaseType } from '../../types/database_type';
-import { getNewId, readOnlyGetNewId } from '../id_generator/id_generator';
+import { Component, ComponentEnum } from '../../types/component_type';
+import { Database } from '../../types/database_type';
+import { getNewId } from '../id_generator/id_generator';
 import { addChild, removeChild } from '../component/component';
 
 // Global database for the entire application.
-export const database : DatabaseType = {};
+export const database : Database = {};
 
-// Given a single component, generates duplicate components for entire subtree of children.
-const produceDuplicates = (database: DatabaseType, component: ComponentType,  parent_id: number = component.parent_id): ComponentType[] => {
 
-    console.log('blahblahblah!!!', readOnlyGetNewId());
+export const createComponent = (
+  database: Database,
+  component_type: ComponentEnum, 
+  parent_id: number,
+) : Database => {
+  const newId = getNewId();
+  return {
+    ...database,
+    [newId]: {
+        id: newId,
+        component_type,
+        parent_id,
+        children: []
+    }
+  }
+}
+
+// moving => return updated database
+export const createTitle = (
+    parent_id: number,
+    title: string = "Default title"
+  ) : Database => {
+    return {
+      id: getNewId(),
+      title: title,
+      component_type: ComponentEnum.Title,
+      parent_id: parent_id,
+      children: []
+    }
+  }
+
+  // create 
+  export const createPage = (
+    database: Database,
+    parent_id: number,
+  ) : Database => {
+    const id = getNewId();
+    const titleComponent = createTitle(id, title);
+    return {
+      id: id,
+      component_type: ComponentEnum.Page,
+      parent_id,
+      children: []
+    }
+  }
+
+  
+// Specifying id is explicit for testing.
+export const createTestComponent = (
+    database: Database,
+    component_type: ComponentEnum,
+    parent_id: number,
+    id: number,
+    children: number[]
+  ) : Database => {
+    return { 
+      ...database,
+      [id]: {
+        id,
+        component_type,
+        parent_id,
+        children
+      }
+    }
+  }
+
+
+const produceDuplicates = (database: Database, component: Component,  parent_id: number = component.parent_id): Component[] => {
     if (component.children.length === 0)
         // if a component does not have children, then return a simple duplicate
         return [{
@@ -19,14 +84,14 @@ const produceDuplicates = (database: DatabaseType, component: ComponentType,  pa
             children: []
         }]
     
-    const duplicateComponent: ComponentType = {
+    const duplicateComponent: Component = {
         id: getNewId(),
         component_type: component.component_type,
         parent_id: parent_id,
         children: []
     }
 
-    let duplicatedDescendants: ComponentType[] = [];
+    let duplicatedDescendants: Component[] = [];
     for (let childId of component.children) {
         const childComponent = getComponent(database, childId);
         duplicatedDescendants = produceDuplicates(database, childComponent, duplicateComponent.id);
@@ -39,7 +104,7 @@ const produceDuplicates = (database: DatabaseType, component: ComponentType,  pa
 }
 
 
-const produceIdsToDelete = (database: DatabaseType, component: ComponentType): number[] => {
+const produceIdsToDelete = (database: Database, component: Component): number[] => {
     const toDelete = [component.id];
     for (let childId of component.children) {
         const childComponent = getComponent(database, childId);
@@ -52,12 +117,12 @@ const produceIdsToDelete = (database: DatabaseType, component: ComponentType): n
 
 // When we move a component, we not only modify the children array of the component the child is moved from and the compnent the child is moved to, we also have to update the parent_id of the child to point to the new parent.
 export const moveComponent = ( 
-    database: DatabaseType, 
-    componentMovedFrom: ComponentType, 
-    componentMovedTo: ComponentType, 
+    database: Database, 
+    componentMovedFrom: Component, 
+    componentMovedTo: Component, 
     childId: number, 
     idx: number = componentMovedTo.children.length
-) : DatabaseType => {
+) : Database => {
     componentMovedFrom = removeChild(componentMovedFrom, childId);
     componentMovedTo = addChild(componentMovedTo, childId, idx);
     return { ...database,
@@ -70,15 +135,15 @@ export const moveComponent = (
     };
 }
 
-export const addComponent = ( database: DatabaseType, component: ComponentType): DatabaseType => {
+export const addComponent = ( database: Database, component: Component): Database => {
     return { ...database, [component.id]: component};
 }
 
-export const getComponent = (database: DatabaseType, id: number): ComponentType => {
+export const getComponent = (database: Database, id: number): Component => {
     return database[id];
 }
 
-export const deleteComponent = (database: DatabaseType, component: ComponentType): DatabaseType => {
+export const deleteComponent = (database: Database, component: Component): Database => {
     const idsToDelete = produceIdsToDelete(database, component);
     for (let id of idsToDelete) {
         delete database[id];
@@ -86,8 +151,8 @@ export const deleteComponent = (database: DatabaseType, component: ComponentType
     return database;
 }
 
-export const duplicateComponent = (database: DatabaseType, component: ComponentType): DatabaseType => {
-    const duplicates: ComponentType[] = produceDuplicates(database, component);
+export const duplicateComponent = (database: Database, component: Component): Database => {
+    const duplicates: Component[] = produceDuplicates(database, component);
     for (let duplicate of duplicates) {
         database = addComponent(database, duplicate);
     }

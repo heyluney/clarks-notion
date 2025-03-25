@@ -1,26 +1,26 @@
 import { describe, test as base, expect } from 'vitest'
 
-import { ComponentType, ComponentEnum } from '../../types/component_type';
+import { Component, ComponentEnum } from '../../types/component_type';
 import { 
-    createComponent, 
+    createTestComponent, 
     addChild, 
     removeChild, 
     getChildren 
 } from './component';
 
 type fixtureShape = {
-    page: ComponentType,
-    emoji: ComponentType
+    page: Component,
+    emoji: Component
 }
 
 export const test = base.extend<fixtureShape>({
     page: async ({ }, use) => {
-        const page : ComponentType = createComponent(ComponentEnum.Page, 0, 1, [2]);
+        const page : Component = createTestComponent(ComponentEnum.Page, 0, 1, [2]);
         await use(page);
     },
     // Emoji component is a child of page component
     emoji: async ({ }, use) => {
-        const emoji : ComponentType = createComponent(ComponentEnum.Emoji, 1, 2);
+        const emoji : Component = createTestComponent(ComponentEnum.Emoji, 1, 2);
         await use(emoji);
     },
 })

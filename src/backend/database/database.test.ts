@@ -1,8 +1,8 @@
 import { describe, test, expect } from 'vitest';
-import { ComponentType, ComponentEnum } from '../../types/component_type';
-import { DatabaseType } from '../../types/database_type';
+import { Component, ComponentEnum } from '../../types/component_type';
+import { Database } from '../../types/database_type';
 
-import { createComponent }from '../component/component';
+import { createTestComponent }from '../component/component';
 import { 
     addComponent, 
     getComponent, 
@@ -11,21 +11,17 @@ import {
     moveComponent
 } from './database';
 
-import { Blah } from '../id_generator/id_generator.test';
-import { id, getNewId } from '../id_generator/id_generator';
+import { setCurrentId } from '../id_generator/id_generator';
 
-// console.log('testArray', testArray);
 
-console.log("top level in database test", getNewId(), id)
-
-const databaseTest = test.extend<{ database: DatabaseType }>({
+const databaseTest = test.extend<{ database: Database }>({
     database: async ({ }, use) => {
-        const database: DatabaseType = {
-            1: createComponent(ComponentEnum.Page, 0, 1, [2]),
-            2: createComponent(ComponentEnum.Emoji, 1, 2, [])
+        const database: Database = {
+            1: createTestComponent(ComponentEnum.Page, 0, 1, [2]),
+            2: createTestComponent(ComponentEnum.Emoji, 1, 2, [])
         };
-        // console.log('id inside databasetest', readOnlyGetNewId());
-        // setNextAvailableId(3);
+
+        setCurrentId(3);
 
         await use(database);
     },
@@ -33,8 +29,8 @@ const databaseTest = test.extend<{ database: DatabaseType }>({
 
 describe("component insertion", () => {
     databaseTest('component can be added to database', ({ database }) => {
-        const journal : ComponentType = 
-            createComponent(ComponentEnum.Journal, 1, 3, []);
+        const journal : Component = 
+            createTestComponent(ComponentEnum.Journal, 1, 3, []);
         database = addComponent(database, journal);
 
         expect(Object.keys(database)).toEqual(["1", "2", "3"]);
@@ -42,76 +38,72 @@ describe("component insertion", () => {
     })
 })
 
-// describe("component duplication", () => {
-//     databaseTest("can duplicate a component", ({ database }) => {
-//         const emoji = getComponent(database, 2);
+describe("component duplication", () => {
+    databaseTest("can duplicate a component", ({ database }) => {
+        const emoji = getComponent(database, 2);
         
-//         database = duplicateComponent(database, emoji);
+        database = duplicateComponent(database, emoji);
 
-//         expect(Object.keys(database)).toEqual(["1", "2", "3"]);
-//         const duplicatedEmoji: ComponentType = getComponent(database, 3);
+        expect(Object.keys(database)).toEqual(["1", "2", "3"]);
+        const duplicatedEmoji: Component = getComponent(database, 3);
 
-//         expect(duplicatedEmoji.id).not.toBe(emoji.id);
-//         expect(duplicatedEmoji.component_type).toBe(emoji.component_type);
-//         expect(duplicatedEmoji.parent_id).toBe(emoji.parent_id);
-//         expect(duplicatedEmoji.children.length).toBe(emoji.children.length);
-//     })
+        expect(duplicatedEmoji.id).not.toBe(emoji.id);
+        expect(duplicatedEmoji.component_type).toBe(emoji.component_type);
+        expect(duplicatedEmoji.parent_id).toBe(emoji.parent_id);
+        expect(duplicatedEmoji.children.length).toBe(emoji.children.length);
+    })
 
-//     databaseTest("if a component is duplicated, it's children are duplicated as well", ({ database }) => {
-//         const page = getComponent(database, 1);
+    databaseTest("if a component is duplicated, it's children are duplicated as well", ({ database }) => {
+        const page = getComponent(database, 1);
         
-//         database = duplicateComponent(database, page);
+        database = duplicateComponent(database, page);
 
-//         expect(Object.keys(database)).toEqual(["1", "2", "3", "4"]);
-//         const duplicatedPage: ComponentType = getComponent(database, 3);
-//         const duplicatedEmoji: ComponentType = getComponent(database, 4);
+        expect(Object.keys(database)).toEqual(["1", "2", "3", "4"]);
+        const duplicatedPage: Component = getComponent(database, 3);
+        const duplicatedEmoji: Component = getComponent(database, 4);
 
-//         // The original page had emoji as it's child. Therefore, the duplicated page should have the duplicated emoji as it's child.
-//         expect(duplicatedPage.children).toContain(duplicatedEmoji.id);
-//     })
-// })
+        // The original page had emoji as it's child. Therefore, the duplicated page should have the duplicated emoji as it's child.
+        expect(duplicatedPage.children).toContain(duplicatedEmoji.id);
+    })
+})
 
-// // database: DatabaseType, 
-// // componentMovedFrom: ComponentType, 
-// // componentMovedTo: ComponentType, 
-// // childId: number, 
-// // idx: number = componentMovedTo.children.length
-// describe("moving a component", () => {
-//     databaseTest("a component can be moved", ({ database }) => {
-//         const anotherPage : ComponentType = 
-//             createComponent(ComponentEnum.Page, 0, 3, []);
-//         database = addComponent(database, anotherPage);
+// database: Database, 
+// componentMovedFrom: Component, 
+// componentMovedTo: Component, 
+// childId: number, 
+// idx: number = componentMovedTo.children.length
+describe("moving a component", () => {
+    databaseTest("a component can be moved", ({ database }) => {
+        const anotherPage : Component = 
+            createTestComponent(ComponentEnum.Page, 0, 3, []);
+        database = addComponent(database, anotherPage);
 
-//         database = moveComponent(database, getComponent(database, 1), getComponent(database, 3), 2);
-//         // console.log('id', database);
-//         // database = duplicateComponent(database, page);
+        const page = getComponent(database, 1);
+        database = moveComponent(database, page, anotherPage, 2);
 
-//         // expect(Object.keys(database)).toEqual(["1", "2", "3", "4"]);
-//         // const duplicatedPage: ComponentType = getComponent(database, 3);
-//         // const duplicatedEmoji: ComponentType = getComponent(database, 4);
-//         // expect(duplicatedPage.children).toContain(duplicatedEmoji.id);
-//     })
-// })
+        database = duplicateComponent(database, page);
 
-// describe('blah', () => {
-//     databaseTest('blah2', ({database}) => {
-//         expect(getNewId()).toBe(3);
-//     })
-// })
-// // describe("component deletion", () => {
-// //     skip();
-// //     databaseTest("a component can be deleted", ({ database }) => {
-// //         const emoji = getComponent(2, database);
-// //         database = deleteComponent(emoji, database);
+        expect(Object.keys(database)).toEqual(["1", "2", "3", "4"]);
+        const duplicatedPage: Component = getComponent(database, 3);
+        const duplicatedEmoji: Component = getComponent(database, 4);
+        expect(duplicatedPage.children).toContain(duplicatedEmoji.id);
+    })
+})
 
-// //         expect(Object.keys(database)).toEqual(["1"]);
-// //     })
 
-// //     databaseTest("a component being deleted will remove it's children", ({ database }) => {
-// //         const page = getComponent(1, database);
-// //         database = deleteComponent(page, database);
+describe("component deletion", () => {
+    databaseTest("a component can be deleted", ({ database }) => {
+        const emoji = getComponent(database, 2);
+        database = deleteComponent(database, emoji);
 
-// //         expect(Object.keys(database)).toEqual([]);
-// //     })
-// // })
+        expect(Object.keys(database)).toEqual(["1"]);
+    })
+
+    databaseTest("a component being deleted will remove it's children", ({ database }) => {
+        const page = getComponent(database, 1);
+        database = deleteComponent(database, page);
+
+        expect(Object.keys(database)).toEqual([]);
+    })
+})
 

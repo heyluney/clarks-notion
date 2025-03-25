@@ -1,5 +1,5 @@
-import { ComponentType } from "./component_type";
+import { Component } from "./component_type";
 
-export type DatabaseType = {
-    [key: number]: ComponentType;
+export type Database = {
+    [key: number]: Component;
 }
