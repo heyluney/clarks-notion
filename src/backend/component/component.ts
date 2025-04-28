@@ -1,79 +1,62 @@
 
 import { getNewId } from "../id_generator/id_generator";
 
-import { ComponentEnum, Component, PageComponent, TitleComponent } from '../../types/component_type';
 
-// don't understand how to do personal properties
-// title: is it a primitive, or is a component
+export enum ComponentType {
+  App = "App",
+  Page = "Page",
+  Comment = "Comment",
+  Emoji = "Emoji",
+  Tasklist = "Tasklist",
+  Journal = "Journal",
+  Title = "Title"
+}
 
-// if something doesn't have a child (e.g. emoji?), does it make sense for it to be a component? or maybe make it a component with children array being empty? 
 
-// if order does not matter, than it's not in children[]
-// tags: component_id
-// emoji: component_id 
-// we leave it open ended or we define a structure? what if we were to do it open ended for now?
+interface BaseComponent {
+  id: number;
+  parent_id: number;
+  children: [];
+}
 
-// each parent can only have one child array
-// Q: does the children have to be of all one component type?
-// A: no, not necessarily, for example a page can have a todolist, and a bunch of flashcards, etc....we will not have this restriction
+interface AppComponent extends BaseComponent {
+  type: ComponentType.App;
+  title: string,
+  emoji: string
+}
 
-// when we create a component, all children array will be set to [] array by default
+interface PageComponent extends BaseComponent {
+  type: ComponentType.Page,
+  title: string,
+  emoji: string
+}
 
-export const createTestComponent = (
-  component_type: ComponentEnum,
-  parent_id: number,
-  id: number = getNewId(),
-  children: number[] = []
-) : Component => {
-  return { 
-    id,
-    component_type,
-    parent_id,
-    children
+type Component = AppComponent | PageComponent;
+
+export const createComponent = <T extends ComponentType>
+(type: T, options: 
+      T extends ComponentType.App ? { parent_id: number, title: string, emoji: string} : 
+      T extends ComponentType.Page ? { parent_id: number, title: string, emoji: string } : 
+never): Extract<Component, {type: T}> => {
+  switch (type) {
+    case ComponentType.App:
+        return { 
+              id: getNewId(), 
+              parent_id: options.parent_id, 
+              type, 
+              title: options.title, 
+              emoji: options.emoji } as Extract<Component, {type: T}>
+    case ComponentType.Page:
+        return { id: getNewId(), 
+              parent_id: options.parent_id,
+              type, 
+              title: options.title, 
+              emoji: options.emoji, 
+              children: [] } as Extract<Component, {type: T}>
+    default:
+        throw new Error("Invalid component type")
   }
 }
-// lift up the createCompoennt function to the databsae level?
-// create and return one type of component
-// but what if the component you're making creates subcomponents by default?
-
-// export const createComponent = (
-//   component_type: ComponentEnum, 
-//   parent_id: number,
-// ) : Component => {
-//   return {
-//     id: getNewId(),
-//     component_type,
-//     parent_id,
-//     children: []
-//   }
-// }
-
-// export const createTitle = (
-//   parent_id: number,
-//   title: string = "Default title"
-// ) : TitleComponent => {
-//   return {
-//     id: getNewId(),
-//     title: title,
-//     component_type: ComponentEnum.Title,
-//     parent_id: parent_id,
-//     children: []
-//   }
-// }
-// // create 
-// export const createPage = (
-//   parent_id: number,
-//   title: string = "Default title"
-// ) : PageComponent => {
-//   const id = getNewId();
-//   const titleComponent = createTitle(id, title);
-//   return {
-//     id: id,
-//     component_type: ComponentEnum.Page,
-//     parent_id,
-//     children: []
-//   }
-// }
 
 export const getChildren = (component: Component): number[] => {
   return component.children;
