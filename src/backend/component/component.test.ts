@@ -1,4 +1,4 @@
-import { describe, test as base, expect } from 'vitest'
+import { describe, test, expect } from 'vitest'
 
 import { Component } from '../../types/component_type';
 import { 
@@ -10,15 +10,25 @@ import {
     getChildren 
 } from './component';
 
-type fixtureShape = {
-    page: Component,
-    emoji: Component
-}
 
-describe("can create a component", () => {
-    base("blahblah", () => {
-        const page = createComponent(ComponentType.Page, {parent_id: 1, title: "my new page!", emoji: "1f415"})
-        expect(page.id).toBe(1);
+describe("Can create component", () => {
+    test("When given the correct input data, a component of a specified ComponentType can be created", () => {
+        const page = createComponent(ComponentType.Page, 
+            {parent_id: -1, title: "my new page!", emoji: "1f415"})
+        console.log('page', page)
+        // expect(page.id).toBe(1);
+        expect(page.parent_id).toBe(-1);
+        expect(page.title).toBe("my new page!");
+        expect(page.type).toBe(ComponentType.Page);
+    })
+
+    test("When not given every piece of data required, the default value associated with the relevant component will be supplied", () => {
+        const page = createComponent(ComponentType.Page, {parent_id: -1})
+        // expect(page.id).toBe(1);
+        expect(page.parent_id).toBe(-1);
+        expect(page.title).toBe(undefined);
+        expect(page.emoji).toBe(undefined);
+        expect(page.type).toBe(ComponentType.Page);
     })
 })
 // export const test = base.extend<fixtureShape>({
