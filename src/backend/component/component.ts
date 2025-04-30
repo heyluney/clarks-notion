@@ -1,34 +1,54 @@
 
 import { getNewId } from "../id_generator/id_generator";
-import { ComponentEnum as CE, defaultOptionMap, optionType, componentType } from "./component_types";
+import { ComponentEnum as CE, defaultOptionMap, optionType, componentType } from "./component_type";
 
-export const createComponent = 
-<T extends CE>(type: T, options: optionType<T>): componentType<T> => {
-  return {
-    type,
-    id: getNewId(),
-    children: [],
-    ...defaultOptionMap[type],
-    ...options
-  };
-}
-export const getChildren = 
-<T extends CE>(component : componentType<T>) : number[] => {
-  return component.children;
-}
-
-export const addChild = 
-<T extends CE>(component : componentType<T>, 
-              childId: number, 
-              idx: number = component.children.length
-): componentType<T> => {
-  if (idx < 0 || idx > component.children.length)
-    throw new Error('invalid index!');
-  return {
-    ...component,
-    children: component.children.toSpliced(idx, 0, childId)
+export const createTestComponent =
+  <T extends CE>(type: T,
+    id: number,
+    parent_id: number = -1,
+    children: number[] = [],
+    options: optionType<T> = {} as optionType<T>): componentType<T> => {
+    return {
+      type,
+      id,
+      parent_id,
+      children,
+      ...defaultOptionMap[type],
+      ...options
+    }
   }
-}
+
+export const createComponent =
+  <T extends CE>(type: T,
+    parent_id: number,
+    options: optionType<T> = {} as optionType<T>): componentType<T> => {
+    return {
+      type,
+      id: getNewId(),
+      parent_id,
+      children: [],
+      ...defaultOptionMap[type],
+      ...options
+    };
+  }
+
+export const getChildren =
+  <T extends CE>(component: componentType<T>): number[] => {
+    return component.children;
+  }
+
+export const addChild =
+  <T extends CE>(component: componentType<T>,
+    childId: number,
+    idx: number = component.children.length
+  ): componentType<T> => {
+    if (idx < 0 || idx > component.children.length)
+      throw new Error('invalid index!');
+    return {
+      ...component,
+      children: component.children.toSpliced(idx, 0, childId)
+    }
+  }
 
 export const removeChild = <T extends CE>(
   component: componentType<T>,

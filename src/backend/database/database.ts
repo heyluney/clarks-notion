@@ -1,54 +1,58 @@
-import { Component, ComponentType } from '../../types/component_type';
-import { Database } from '../../types/database_type';
+// import { Component, ComponentType } from '../../types/component_type';
+import { Database } from './database_type';
 import { getNewId } from '../id_generator/id_generator';
 import { addChild, removeChild } from '../component/component';
+import { ComponentEnum as CE } from '../component/component_type';
+import { componentType } from '../component/component_type';
 
 // Global database for the entire application.
 export const database: Database = {};
 
-// component creation has been moved to the component class 
-export const createComponent = (
+
+export const getComponent = (database: Database, id: number) => {
+    return database[id];
+}
+
+// side effect of updating children array of parent when we insert a component
+export const insertComponent = <T extends CE>(
     database: Database,
-    component_type: ComponentType,
-    parent_id: number,
-): Database => {
-    const newId = getNewId();
-    const newComponent : Component = {
-        id: newId,
-        component_type: component_type,
-        parent_id: parent_id,
-        children: []
-    }
-    const parentComponent = getComponent(database, parent_id);
-    return {
-        ...database,
-        [parent_id]: {
-            ...parentComponent,
-            children: [...parentComponent.children, newId]
-        },
-        [newId]: newComponent
+    component: componentType<T>
+) => {
+    const parentComponent = getComponent(database, component.parent_id);
+    return { ...database,
+     [parentComponent.id]: {
+        ...parentComponent,
+        children: [...parentComponent.children, component.id]
+     },
+     [component.id]: component 
     }
 }
 
+// export const createComponent = (
+//     database: Database,
+//     component_type: ComponentType,
+//     parent_id: number,
+// ): Database => {
+//     const newId = getNewId();
+//     const newComponent : Component = {
+//         id: newId,
+//         component_type: component_type,
+//         parent_id: parent_id,
+//         children: []
+//     }
+//     const parentComponent = getComponent(database, parent_id);
+//     return {
+//         ...database,
+//         [parent_id]: {
+//             ...parentComponent,
+//             children: [...parentComponent.children, newId]
+//         },
+//         [newId]: newComponent
+//     }
+// }
 
-// Specifying id is explicit for testing.
-export const createTestComponent = (
-    database: Database,
-    component_type: ComponentEnum,
-    parent_id: number,
-    id: number,
-    children: number[]
-): Database => {
-    return {
-        ...database,
-        [id]: {
-            id,
-            component_type,
-            parent_id,
-            children
-        }
-    }
-}
+
+
 
 const produceDuplicates = (database: Database, component: Component, parent_id: number = component.parent_id): Component[] => {
     if (component.children.length === 0)
@@ -111,13 +115,8 @@ export const moveComponent = (
     };
 }
 
-export const addComponent = (database: Database, component: Component): Database => {
-    return { ...database, [component.id]: component };
-}
 
-export const getComponent = (database: Database, id: number): Component => {
-    return database[id];
-}
+
 
 export const deleteComponent = (database: Database, component: Component): Database => {
     const idsToDelete = produceIdsToDelete(database, component);

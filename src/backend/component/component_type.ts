@@ -21,31 +21,27 @@ export const defaultOptionMap: { [key in ComponentEnum]: any } = {
 }
 
 
-interface BaseOptions {
-    parent_id: number;
-}
-
-export interface AppOptions extends BaseOptions {
+export interface AppOptions {
     title?: string,
     emoji?: string
 }
 
-export interface PageOptions extends BaseOptions {
+export interface PageOptions {
     title?: string,
     emoji?: string
 }
 
-export interface JournalOptions extends BaseOptions {
+export interface JournalOptions {
     title?: string,
     emoji?: string
 }
 
-export interface TasklistOptions extends BaseOptions {
+export interface TasklistOptions {
     title?: string,
     emoji?: string
 }
 
-interface EmojiOptions extends BaseOptions {
+interface EmojiOptions {
     title?: string,
     emoji?: string
 }
