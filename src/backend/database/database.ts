@@ -6,15 +6,7 @@ import { addChild, removeChild } from '../component/component';
 // Global database for the entire application.
 export const database: Database = {};
 
-// every component has common properties (e.g. parent_id, id)
-// but also attributes specific to the componet itself
-
-// object that represents type 
-
-// { component_type: Page, title: "blah", emoji: blah }, 1
-// parentId should also have that new object inserted into it
-
-// this function is misleading because it's not realy creating a new component, it's more like "create and insert into database"
+// component creation has been moved to the component class 
 export const createComponent = (
     database: Database,
     component_type: ComponentType,
