@@ -1,4 +1,3 @@
-// import { Component, ComponentType } from '../../types/component_type';
 import { Database } from './database_type';
 import { getNewTestId  } from '../id_generator/test_id_generator';
 import { addChild, removeChild } from '../component/component';
@@ -12,7 +11,7 @@ export const getComponent = (database: Database, id: number) => {
     return database[id];
 }
 
-// Inserts component into database. Update parent's child array.
+// Inserts component into database. Update parent's reference to child.
 export const insertComponent = (
     database: Database,
     component: Component
@@ -48,6 +47,7 @@ export const duplicateComponent =
     return database;
 }
 
+// Removes a component and all of it's children from the database.
 export const deleteComponent = (database: Database, component: Component): Database => {
     for (let childId of component.children) {
         database = deleteComponent(database, getComponent(database, childId));
@@ -56,7 +56,7 @@ export const deleteComponent = (database: Database, component: Component): Datab
     return database;
 }
 
-// childId is the id of the component being moved.
+// Moves a component with id=childId from componentMovedFrom to componentMovedTo (can be the same component).
 export const moveComponent = (
     database: Database,
     componentMovedFrom: Component,
@@ -64,9 +64,8 @@ export const moveComponent = (
     childId: number,
     idx: number = componentMovedTo.children.length
 ): Database => {
-    // this doesn't work because componentMovedTo also needs to have that child removed
     componentMovedFrom = removeChild(componentMovedFrom, childId);
-  
+
     if (componentMovedTo.id === componentMovedFrom.id) 
         componentMovedTo = componentMovedFrom;
 

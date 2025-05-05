@@ -1,17 +1,16 @@
-// import { Component, ComponentType } from '../../types/component_type';
 import { Database } from './database_type';
 import { getNewId } from '../id_generator/id_generator';
 import { addChild, removeChild } from '../component/component';
 import { Component } from '../component/component_type';
 
-// Global database for the entire application.
+// Production database for the application.
 export const database: Database = {};
-
 
 export const getComponent = (database: Database, id: number) => {
     return database[id];
 }
 
+// Inserts component into database. Update parent's reference to child.
 export const insertComponent = (
     database: Database,
     component: Component
@@ -28,41 +27,36 @@ export const insertComponent = (
     }
 }
 
-// Returns a list of duplicated components based on original component.
-const produceDuplicates = (database: Database, component: Component, parent_id: number = component.parent_id): Component[] => {
-    // Component is a leaf node, so return an array of single duplicate.
-    if (component.children.length === 0)
-        return [{...component, id: getNewId() }]
-
-    const duplicateComponent: Component = 
-        {...component, id: getNewId(), parent_id: parent_id, children: []}
-
-    let duplicatedDescendants: Component[] = [];
-    for (let child_id of component.children) {
-        const childComponent = getComponent(database, child_id);
-        duplicatedDescendants = 
-            produceDuplicates(database, childComponent, duplicateComponent.id);
-
-        for (let descendant of duplicatedDescendants) {
-            duplicateComponent.children.push(descendant.id);
-        }
-    }
-    return [duplicateComponent].concat(duplicatedDescendants);
-}
-
-
-const produceIdsToDelete = (database: Database, component: Component): number[] => {
-    const toDelete = [component.id];
+// Duplicates the component and it's children, inserting all into the database. Returns the updated database.
+export const duplicateComponent = 
+(database: Database, component: Component, parent_id: number = component.parent_id): Database => {
+    const duplicatedComponent = {
+        ...component, 
+        id: getNewId(), 
+        parent_id: parent_id,
+        children: []
+    };
+    database = insertComponent(database, duplicatedComponent);
     for (let childId of component.children) {
-        const childComponent = getComponent(database, childId);
-        for (let descendantId of produceIdsToDelete(database, childComponent)) {
-            toDelete.push(descendantId);
-        }
+        database = duplicateComponent(database, 
+            getComponent(database, childId), 
+            duplicatedComponent.id);
     }
-    return toDelete;
+
+    return database;
 }
 
-// When we move a component, we not only modify the children array of the component the child is moved from and the compnent the child is moved to, we also have to update the parent_id of the child to point to the new parent.
+// Removes a component and all of it's children from the database.
+export const deleteComponent = (database: Database, component: Component): Database => {
+    for (let childId of component.children) {
+        database = deleteComponent(database, getComponent(database, childId));
+    }
+    delete database[component.id];
+    return database;
+}
+
+
+// Moves a component with id=childId from componentMovedFrom to componentMovedTo (can be the same component).
 export const moveComponent = (
     database: Database,
     componentMovedFrom: Component,
@@ -71,6 +65,10 @@ export const moveComponent = (
     idx: number = componentMovedTo.children.length
 ): Database => {
     componentMovedFrom = removeChild(componentMovedFrom, childId);
+
+    if (componentMovedTo.id === componentMovedFrom.id) 
+        componentMovedTo = componentMovedFrom;
+
     componentMovedTo = addChild(componentMovedTo, childId, idx);
     return {
         ...database,
@@ -81,24 +79,4 @@ export const moveComponent = (
         [componentMovedFrom.id]: componentMovedFrom,
         [componentMovedTo.id]: componentMovedTo
     };
-}
-
-
-
-
-export const deleteComponent = (database: Database, component: Component): Database => {
-    const idsToDelete = produceIdsToDelete(database, component);
-    for (let id of idsToDelete) {
-        delete database[id];
-    }
-    return database;
-}
-
-export const duplicateComponent 
-= (database: Database, component: Component): Database => {
-    const duplicates: Component[] = produceDuplicates(database, component);
-    for (let duplicate of duplicates) {
-        database = insertComponent(database, duplicate);
-    }
-    return database;
 }
