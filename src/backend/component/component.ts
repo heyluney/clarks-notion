@@ -1,13 +1,13 @@
 
 import { getNewId } from "../id_generator/id_generator";
-import { ComponentEnum as CE, defaultOptionMap, optionType, componentType } from "./component_type";
+import { ComponentEnum as CE, defaultOptionMap, OptionType, ComponentType } from "./component_type";
 
 export const createTestComponent =
   <T extends CE>(type: T,
     id: number,
     parent_id: number = -1,
     children: number[] = [],
-    options: optionType<T> = {} as optionType<T>): componentType<T> => {
+    options: OptionType<T> = {} as OptionType<T>): ComponentType<T> => {
     return {
       type,
       id,
@@ -21,7 +21,7 @@ export const createTestComponent =
 export const createComponent =
   <T extends CE>(type: T,
     parent_id: number,
-    options: optionType<T> = {} as optionType<T>): componentType<T> => {
+    options: OptionType<T> = {} as OptionType<T>): ComponentType<T> => {
     return {
       type,
       id: getNewId(),
@@ -33,15 +33,15 @@ export const createComponent =
   }
 
 export const getChildren =
-  <T extends CE>(component: componentType<T>): number[] => {
+  <T extends CE>(component: ComponentType<T>): number[] => {
     return component.children;
   }
 
 export const addChild =
-  <T extends CE>(component: componentType<T>,
+  <T extends CE>(component: ComponentType<T>,
     childId: number,
     idx: number = component.children.length
-  ): componentType<T> => {
+  ): ComponentType<T> => {
     if (idx < 0 || idx > component.children.length)
       throw new Error('invalid index!');
     return {
@@ -51,9 +51,9 @@ export const addChild =
   }
 
 export const removeChild = <T extends CE>(
-  component: componentType<T>,
+  component: ComponentType<T>,
   childId: number
-): componentType<T> => {
+): ComponentType<T> => {
   const child_idx = component.children.indexOf(childId);
   if (child_idx === -1) throw new Error('child not found!');
   return {

@@ -31,17 +31,22 @@ export interface PageOptions {
     emoji?: string
 }
 
-export interface JournalOptions {
+interface JournalOptions {
     title?: string,
     emoji?: string
 }
 
-export interface TasklistOptions {
+interface TasklistOptions {
     title?: string,
     emoji?: string
 }
 
 interface EmojiOptions {
+    title?: string,
+    emoji?: string
+}
+
+interface CommentOptions {
     title?: string,
     emoji?: string
 }
@@ -74,20 +79,28 @@ interface EmojiComponent extends BaseComponent, EmojiOptions {
     type: ComponentEnum.Emoji
 }
 
+interface CommentComponent extends BaseComponent, CommentOptions {
+    type: ComponentEnum.Comment
+}
+
 // Map from component type to input configuration (configuration necessary to create a component of that type).
-export type optionType<T extends ComponentEnum> =
+export type OptionType<T extends ComponentEnum> =
   T extends ComponentEnum.App ? AppOptions :
   T extends ComponentEnum.Page ? PageOptions :
   T extends ComponentEnum.Tasklist ? TasklistOptions :
   T extends ComponentEnum.Journal ? JournalOptions :
   T extends ComponentEnum.Emoji ? EmojiOptions :
+  T extends ComponentEnum.Comment ? CommentOptions : 
   never;
 
   // Map from component type to a component of that specified type.
-export type componentType<T extends ComponentEnum> =
+export type ComponentType<T extends ComponentEnum> =
   T extends ComponentEnum.App ? AppComponent :
   T extends ComponentEnum.Page ? PageComponent :
   T extends ComponentEnum.Journal ? JournalComponent : 
   T extends ComponentEnum.Tasklist ? TasklistComponent :
   T extends ComponentEnum.Emoji ? EmojiComponent :
+  T extends ComponentEnum.Comment ? CommentComponent : 
   never;
+
+export type Component = AppComponent | PageComponent | JournalComponent | TasklistComponent | EmojiComponent | CommentComponent;

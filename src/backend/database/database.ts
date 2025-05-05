@@ -2,8 +2,7 @@
 import { Database } from './database_type';
 import { getNewId } from '../id_generator/id_generator';
 import { addChild, removeChild } from '../component/component';
-import { ComponentEnum as CE } from '../component/component_type';
-import { componentType } from '../component/component_type';
+import { Component } from '../component/component_type';
 
 // Global database for the entire application.
 export const database: Database = {};
@@ -13,12 +12,13 @@ export const getComponent = (database: Database, id: number) => {
     return database[id];
 }
 
-// side effect of updating children array of parent when we insert a component
-export const insertComponent = <T extends CE>(
+export const insertComponent = (
     database: Database,
-    component: componentType<T>
-) => {
+    component: Component
+) : Database => {
     const parentComponent = getComponent(database, component.parent_id);
+    if (parentComponent === undefined) 
+        throw new Error("parent component not found!");
     return { ...database,
      [parentComponent.id]: {
         ...parentComponent,
@@ -28,52 +28,20 @@ export const insertComponent = <T extends CE>(
     }
 }
 
-// export const createComponent = (
-//     database: Database,
-//     component_type: ComponentType,
-//     parent_id: number,
-// ): Database => {
-//     const newId = getNewId();
-//     const newComponent : Component = {
-//         id: newId,
-//         component_type: component_type,
-//         parent_id: parent_id,
-//         children: []
-//     }
-//     const parentComponent = getComponent(database, parent_id);
-//     return {
-//         ...database,
-//         [parent_id]: {
-//             ...parentComponent,
-//             children: [...parentComponent.children, newId]
-//         },
-//         [newId]: newComponent
-//     }
-// }
-
-
-
-
+// Returns a list of duplicated components based on original component.
 const produceDuplicates = (database: Database, component: Component, parent_id: number = component.parent_id): Component[] => {
+    // Component is a leaf node, so return an array of single duplicate.
     if (component.children.length === 0)
-        return [{
-            id: getNewId(),
-            component_type: component.component_type,
-            parent_id: parent_id,
-            children: []
-        }]
+        return [{...component, id: getNewId() }]
 
-    const duplicateComponent: Component = {
-        id: getNewId(),
-        component_type: component.component_type,
-        parent_id: parent_id,
-        children: []
-    }
+    const duplicateComponent: Component = 
+        {...component, id: getNewId(), parent_id: parent_id, children: []}
 
     let duplicatedDescendants: Component[] = [];
-    for (let childId of component.children) {
-        const childComponent = getComponent(database, childId);
-        duplicatedDescendants = produceDuplicates(database, childComponent, duplicateComponent.id);
+    for (let child_id of component.children) {
+        const childComponent = getComponent(database, child_id);
+        duplicatedDescendants = 
+            produceDuplicates(database, childComponent, duplicateComponent.id);
 
         for (let descendant of duplicatedDescendants) {
             duplicateComponent.children.push(descendant.id);
@@ -126,10 +94,11 @@ export const deleteComponent = (database: Database, component: Component): Datab
     return database;
 }
 
-export const duplicateComponent = (database: Database, component: Component): Database => {
+export const duplicateComponent 
+= (database: Database, component: Component): Database => {
     const duplicates: Component[] = produceDuplicates(database, component);
     for (let duplicate of duplicates) {
-        database = addComponent(database, duplicate);
+        database = insertComponent(database, duplicate);
     }
     return database;
 }
