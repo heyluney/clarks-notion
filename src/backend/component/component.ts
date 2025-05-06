@@ -2,6 +2,7 @@
 import { getNewId } from "../id_generator/id_generator";
 import { ComponentEnum as CE, defaultOptionMap, OptionType, ComponentType } from "./component_type";
 
+
 export const createTestComponent =
   <T extends CE>(type: T,
     id: number,
@@ -24,7 +25,7 @@ export const createComponent =
     options: OptionType<T> = {} as OptionType<T>): ComponentType<T> => {
     return {
       type,
-      id: getNewId(),
+      id: type === CE.App ? 0 : getNewId(),
       parent_id,
       children: [],
       ...defaultOptionMap[type],

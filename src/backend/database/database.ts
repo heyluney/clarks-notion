@@ -1,10 +1,16 @@
 import { Database } from './database_type';
 import { getNewId } from '../id_generator/id_generator';
 import { addChild, removeChild } from '../component/component';
-import { Component } from '../component/component_type';
+import { Component, ComponentEnum as CE } from '../component/component_type';
 
 // Production database for the application.
-export const database: Database = {};
+export let database: Database = {};
+
+export const getDatabase = () => database;
+
+export const setDatabase = (updatedDB : Database) => {
+    database = updatedDB;
+}
 
 export const getComponent = (database: Database, id: number) => {
     return database[id];
@@ -15,9 +21,15 @@ export const insertComponent = (
     database: Database,
     component: Component
 ) : Database => {
+    // If the component inserted into the database is of type App, no parent is required.
+    if (component.type === CE.App) {
+         return { [component.id]: component }
+    }
     const parentComponent = getComponent(database, component.parent_id);
     if (parentComponent === undefined) 
         throw new Error("parent component not found!");
+
+    // we will create a component first, then
     return { ...database,
      [parentComponent.id]: {
         ...parentComponent,

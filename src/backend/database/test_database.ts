@@ -1,7 +1,7 @@
 import { Database } from './database_type';
 import { getNewTestId  } from '../id_generator/test_id_generator';
 import { addChild, removeChild } from '../component/component';
-import { Component } from '../component/component_type';
+import { Component, ComponentEnum as CE } from '../component/component_type';
 
 // Test database for testing purposes.
 export const database: Database = {};
@@ -16,6 +16,12 @@ export const insertComponent = (
     database: Database,
     component: Component
 ) : Database => {
+    // If the component inserted into the database is of type App, no parent is required.
+    if (component.type === CE.App) return {
+        ...database,
+        [component.id]: component
+    }
+
     const parentComponent = getComponent(database, component.parent_id);
     if (parentComponent === undefined) 
         throw new Error("parent component not found!");
