@@ -1,11 +1,18 @@
 import { useParams } from "react-router";
+import { PageComponent } from "../backend/component/component_type";
 
-const Page = () => {
-    const id = useParams();
-    console.log('page_id is', id);
+interface PageProps {
+    page: PageComponent
+}
+
+const Page : React.FC<PageProps> = (props: PageProps) => {
+    const { page } = props;
+
     return (
+
     <div>
-        This is a page!
+        <div>{page.title}</div>
+        <div>{page.emoji}</div>
     </div>
     )
 }

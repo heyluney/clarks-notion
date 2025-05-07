@@ -1,6 +1,6 @@
 import './App.css'
 
-import { useState, createContext } from 'react';
+import { useState, createContext, Dispatch, SetStateAction } from 'react';
 
 import { seedDatabase } from './backend/database/seeded_database';
 
@@ -8,6 +8,15 @@ import { createComponent } from './backend/component/component';
 import { ComponentEnum as CE } from './backend/component/component_type';
 import { Database } from './backend/database/database_type';
 import SideBar from './components/Sidebar';
+import { retrievePages } from './backend/database/database';
+import { PageComponent } from './backend/component/component_type';
+import Page from './components/Page';
+import { Routes, Route } from 'react-router';
+import Error from './Error';
+type PageContextType = {
+  database: Database,
+  updateDatabase: Dispatch<SetStateAction<Database>>
+};
 
 const App = () => {
   const [database, updateDatabase] = useState<Database>(() => {
@@ -16,21 +25,37 @@ const App = () => {
       return JSON.parse(db as string);
     });
 
-    // context to move this to 
+
   console.log('database', database);
   return (   
     <PageContext.Provider value={{
-      database, updateDatabase
+      database: database, 
+      updateDatabase: updateDatabase
     }}>
       <div className="app">
+        app
         <SideBar />
-        This is the app!
+        <Routes>
+          <Route key="clark" path="/clarks-notion/error" element={<Error/>} />
+          <Route key="clark2" path="/clarks-notion/pages/1" element={<Page page={retrievePages(database)[0]}/>} />
+
+        </Routes>
       </div>
     </PageContext.Provider>
   )
 }
 
-export const PageContext = createContext();
+
+          // {database && retrievePages(database).map(page =>
+          //   <Route
+          //     key={page.id}
+          //     path={`/clarks-notion/pages/${page.id}`} 
+          //     element={<Page page={page}/>}
+          //   />
+          // )}
+
+
+export const PageContext = createContext<PageContextType | undefined>(undefined);
 
 export default App;
 

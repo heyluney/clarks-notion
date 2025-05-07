@@ -63,7 +63,7 @@ interface AppComponent extends BaseComponent, AppOptions {
     type: ComponentEnum.App
 }
 
-interface PageComponent extends BaseComponent, PageOptions {
+export interface PageComponent extends BaseComponent, PageOptions {
     type: ComponentEnum.Page
 }
 

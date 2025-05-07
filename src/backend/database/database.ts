@@ -1,10 +1,16 @@
 import { Database } from './database_type';
 import { getNewId } from '../id_generator/id_generator';
 import { addChild, removeChild } from '../component/component';
-import { Component, ComponentEnum as CE } from '../component/component_type';
+import { Component, ComponentEnum as CE, ComponentType } from '../component/component_type';
 
 // Production database for the application.
 export let database: Database = {};
+
+// Retrieves all pages in the database.
+export const retrievePages = (db : Database) : ComponentType<CE.Page>[] => {
+    console.log('db', db)
+    return Object.values(db).filter(component => component.type === CE.Page);
+}
 
 export const getDatabase = () => database;
 
